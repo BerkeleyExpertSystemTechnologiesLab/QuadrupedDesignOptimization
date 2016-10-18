@@ -1,3 +1,9 @@
+# MATLAB temp files
+*~
+
+# Other temp files
+~*
+
 # Compiled Object files
 *.slo
 *.lo
