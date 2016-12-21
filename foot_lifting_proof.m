@@ -13,7 +13,7 @@ w = 0.12;
 h = 0.27;
 
 % The initial vectors of its four feet
-a = [-w/2; l/2; -h];;
+a = [-w/2; l/2; -h];
 b = [w/2; l/2; -h];
 c = [-w/2; -l/2; -h];
 d = [w/2; -l/2; -h];
@@ -109,6 +109,10 @@ a5d2 = d2 - a5;
 planar6 = a5d2'*(cross(a5b5, a5c2))
 % Actually, this seems to be true (at least to machine
 % precision error.) Huh.
+
+% ^NOTE: the above is incorrect, see qpedspine3Smove, where
+%  we show that the rotation for the rear feet has to be the negative of
+%  what I have above in this script file.
 
 
 
