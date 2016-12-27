@@ -10,6 +10,7 @@ function [ a2, b2, c2, d2 ] = qpedspineContManipmove(K, phi, s, plot_on, front_o
 %       K (kappa), the curvature of the spine. K = 1/r, where r is the radius of curvature.
 %           This parameter rotates the spine endpoint around the Z-axis.
 %       phi, the angle of the plane containing the arc. This is what rotates the spine around the X-axis.
+%           This angle should be in radians.
 %       s, the arc length of the curve. This draws out the curve from 0 to L, the total length of the spine.
 %           This parameter is treated also as L0, the initial length of the spine.
 %           Specifically, the initial location of the endpoint of the spine is at (0, +s, 0).
@@ -27,8 +28,13 @@ function [ a2, b2, c2, d2 ] = qpedspineContManipmove(K, phi, s, plot_on, front_o
 %       T_constK_rotated.m, function that generates the transformation matrix for a continuum 
 %       manipulator (e.g. a constant-radius curve), with the above-described coordinate system.
 
-% Note that this kinematics script uses the location of the spherical spine joint
+% Note that this kinematics script uses the location of the center of the spine
 % as the origin, (0,0,0).
+
+% A quick check. Noting that the spine length "s" represents only one half of the spine,
+% the spine length cannot be more than half the length of the robot.
+% Otherwise the spine would stick out the front!
+assert(s < l/2, 'Spine is longer than the robot! Exiting.');
 
 % First, calculate the initial locations of the four feet.
 % Looking from the back of the robot,
@@ -40,6 +46,30 @@ b = [w/2; l/2; -h];
 c = [-w/2; -l/2; -h];
 % Rear right:
 d = [w/2; -l/2; -h];
+
+% Note that each of these need an additional coordinate to
+% be multiplied by a homogenous transformation matrix.
+% Each of these should be 4x1.
+a = [a; 1];
+b = [b; 1];
+c = [c; 1];
+d = [d; 1];
+
+% Also, since the continuum manipulator spine
+% has the front body at some offset, since part of the "front"
+% is really the spine fully extended,
+% we need to offset each of the feet by this amount.
+% Otherwise the spine will be asymetric.
+offset = [0; -s; 0; 1];
+% ...note that we're including the homogenous coordinate here.
+% (TO-DO: what's the proper name for this "1"?)
+
+% STOPPED HERE 2016-12-27 4pm.
+
+% The transformation matrix for the front feet will be 
+T_front = T_constK_rotated([K, phi, s]);
+
+% Then, each of the 
 
 % Then, calculate the three transformation matrices, one for each of
 % the spherical joint angles.
@@ -162,8 +192,8 @@ if plot_on
     line([k2(1); 0], [k2(2); 0], [k2(3); 0]);
     % clean up the plot
     %axis equal;
-    title_string = strcat('Qped with t,g,p=(',num2str(t*180/pi),',', ...
-        num2str(g*180/pi),',',num2str(p*180/pi),'), fonly=',num2str(front_only));
+    title_string = strcat('Qped with k,phi,s=(',num2str(K),',', ...
+        num2str(phi*180/pi),',',num2str(s),'), fonly=',num2str(front_only));
     title(title_string);
     xlabel('x, width');
     ylabel('y, length');

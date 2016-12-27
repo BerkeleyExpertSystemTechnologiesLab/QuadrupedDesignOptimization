@@ -18,7 +18,6 @@ L = 0.25;
 r = 0.2;
 % Curvature is the inverse of radius
 K = 1/r;
-%K = L;
 phi_deg = 60;
 %phi_deg = 0;
 % Change phi to radians (since it's easier to intuitively understand in degrees, first.)
