@@ -20,7 +20,7 @@ function [ a2, b2, c2, d2 ] = qpedspineContManipmove(K, phi, s, plot_on, front_o
 %           but if this flag is off, then there is a spine from -s to +s along the y-axis.
 %           This will be used to explore questions about planarity of the feet.
 %           TO-DO: what would rotation mean in the context of this transformation>
-%       l, the initial length of the robot (y-direction)
+%       l, the initial length of the front/rear section of the robot, not including spine (y-direction)
 %       w, the initial width of the robot (x-direction)
 %       h, the initial height of the robot (z-direction)
 %
@@ -30,13 +30,11 @@ function [ a2, b2, c2, d2 ] = qpedspineContManipmove(K, phi, s, plot_on, front_o
 
 % Note that this kinematics script uses the location of the center of the spine
 % as the origin, (0,0,0).
+% Also, note that the total length of the robot with no spine bending is l+s (or l+2*s if
+% front_only == 0).
 
-% A quick check. Noting that the spine length "s" represents only one half of the spine,
-% the spine length cannot be more than half the length of the robot.
-% Otherwise the spine would stick out the front!
-assert(s < l/2, 'Spine is longer than the robot! Exiting.');
-
-% First, calculate the initial locations of the four feet.
+% First, calculate the initial locations of the four feet, with respect
+% to the start of the "front section." This does not account for the length of the spine.
 % Looking from the back of the robot,
 % Front left:
 a = [-w/2; l/2; -h];
@@ -55,85 +53,69 @@ b = [b; 1];
 c = [c; 1];
 d = [d; 1];
 
-% Also, since the continuum manipulator spine
-% has the front body at some offset, since part of the "front"
-% is really the spine fully extended,
-% we need to offset each of the feet by this amount.
-% Otherwise the spine will be asymetric.
-offset = [0; -s; 0; 1];
-% ...note that we're including the homogenous coordinate here.
-% (TO-DO: what's the proper name for this "1"?)
+% Since we are not accounting for the spine length in these foot positions,
+% we can use the transformation T directly on the above points, instead of
+% having to calculate some offset, [0; -s; 0] or something like that.
 
-% STOPPED HERE 2016-12-27 4pm.
+% NOT DOING THE FOLLOWING:
+% % Also, since the continuum manipulator spine
+% % has the front body at some offset, since part of the "front"
+% % is really the spine fully extended,
+% % we need to offset each of the feet by this amount.
+% % Otherwise the spine will be asymetric.
+% %offset = [0; -s; 0; 1];
+% % ...note that we're including the homogenous coordinate here.
+% % (TO-DO: what's the proper name for this "1"?)
 
 % The transformation matrix for the front feet will be 
-T_front = T_constK_rotated([K, phi, s]);
+T_f = T_constK_rotated([K, phi, s]);
 
-% Then, each of the 
+% Move the front feet:
+a2 = T_f*a;
+b2 = T_f*b;
 
-% Then, calculate the three transformation matrices, one for each of
-% the spherical joint angles.
-
-% Rotating around the x-axis by theta
-% Positive t is clockwise rotation
-Rx = [  1,       0,         0; ...
-        0,       cos(t),    -sin(t); ...
-        0,       sin(t),    cos(t)];
-
-% rotating around the y-axis by gamma
-Ry = [  cos(g),  0,         sin(g); ...
-        0,       1,         0; ...
-        -sin(g)  0,         cos(g)];
-
-% rotating around the z-axis by phi
-% Positive p is counterclockwise rotation
-Rz = [  cos(p),  -sin(p),   0; ...
-        sin(p),  cos(p),    0; ...
-        0,       0,         1];
-     
-% The combined total rotation matrix.
-R = Rz*Ry*Rx;
-
-% Rotate the front feet.
-a2 = R*a;
-b2 = R*b;
-
-% Calculate the positions of the back two feet.
-% initialize to the original position,
-% then change if needed.
+% For now, the back feet will not move.
+% TO-DO: try this with a [0; -s; 0] offset for the back feet.
 c2 = c;
 d2 = d;
+
+% If the back feet should be attached to a spine and moved too:
 if ~front_only
-    % Note that we need an opposite rotation for the 
-    % rear two feet. Each of the angles needs to be
-    % negated.
-    % Let's make three more rotation matrices so we can re-use
-    % them later in the plotting section, too.
-    
-    % Rotating around the x-axis by -theta
-    t_rear = -t;
-    Rx_rear = [  1,       0,         0; ...
-            0,       cos(t_rear),    -sin(t_rear); ...
-            0,       sin(t_rear),    cos(t_rear)];
-
-    % rotating around the y-axis by -gamma
-    g_rear = -g;
-    Ry_rear = [  cos(g_rear),  0,         sin(g_rear); ...
-            0,       1,         0; ...
-            -sin(g_rear)  0,         cos(g_rear)];
-
-    % rotating around the z-axis by -phi
-    p_rear = -p;
-    Rz_rear = [  cos(p_rear),  -sin(p_rear),   0; ...
-            sin(p_rear),  cos(p_rear),    0; ...
-            0,       0,         1];
-    % The combined rotation matrix for the rear feet is
-    R_rear = Rz_rear*Ry_rear*Rx_rear;
-    
-    % Finall, move the two feet.
-    c2 = R_rear*c;
-    d2 = R_rear*d;
+    % fill this in later.
 end
+
+% The old, 3S joint calculations for the back feet:
+% if ~front_only
+%     % Note that we need an opposite rotation for the 
+%     % rear two feet. Each of the angles needs to be
+%     % negated.
+%     % Let's make three more rotation matrices so we can re-use
+%     % them later in the plotting section, too.
+%     
+%     % Rotating around the x-axis by -theta
+%     t_rear = -t;
+%     Rx_rear = [  1,       0,         0; ...
+%             0,       cos(t_rear),    -sin(t_rear); ...
+%             0,       sin(t_rear),    cos(t_rear)];
+% 
+%     % rotating around the y-axis by -gamma
+%     g_rear = -g;
+%     Ry_rear = [  cos(g_rear),  0,         sin(g_rear); ...
+%             0,       1,         0; ...
+%             -sin(g_rear)  0,         cos(g_rear)];
+% 
+%     % rotating around the z-axis by -phi
+%     p_rear = -p;
+%     Rz_rear = [  cos(p_rear),  -sin(p_rear),   0; ...
+%             sin(p_rear),  cos(p_rear),    0; ...
+%             0,       0,         1];
+%     % The combined rotation matrix for the rear feet is
+%     R_rear = Rz_rear*Ry_rear*Rx_rear;
+%     
+%     % Finall, move the two feet.
+%     c2 = R_rear*c;
+%     d2 = R_rear*d;
+% end
 
 % Then, if a plot should be created,
 if plot_on
@@ -142,18 +124,19 @@ if plot_on
     % the spine, shoulders, and hips.
     % Create the points what we want to draw lines between, then 
     % transform them the same way as the feet.
+    % NOTE that here we use the [0; 0; 0; 1] homogenous augmentation.
     % The three shoulder points are:
-    e = [-w/2; l/2; 0];
-    f = [0; l/2; 0];
-    i = [w/2; l/2; 0];
+    e = [-w/2; l/2; 0; 1];
+    f = [0; l/2; 0; 1];
+    i = [w/2; l/2; 0; 1];
     % The three hip points are:
-    j = [-w/2; -l/2; 0];
-    k = [0; -l/2; 0];
-    m = [w/2; -l/2; 0];
+    j = [-w/2; -l/2; 0; 1];
+    k = [0; -l/2; 0; 1];
+    m = [w/2; -l/2; 0; 1];
     % Rotate each of these points,
     % noting that we must use the R matrix for the front
     % legs/body and the R_rear matrix for the rear legs/body.
-    e2 = R*e;
+    e2 = T_f*e;
     f2 = R*f;
     i2 = R*i;
     % the rear points are only rotated if the 
