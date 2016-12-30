@@ -1,4 +1,4 @@
-function [ a2, b2, c2, d2 ] = qpedspine3Smove(t, g, p, plot_on, front_only, l, w, h)
+function [ a2, b2, c2, d2 ] = qpedspine3SMove(t, g, p, plot_on, front_only, l, w, h)
 % qpedspine3Smove.m Calculates the foot locations of a quadruped with a 3S spine joint
 %   This function calculates the location of the feet of a quadruped robot
 %   with an ideal 3-DOF spherical joint at its spine.
