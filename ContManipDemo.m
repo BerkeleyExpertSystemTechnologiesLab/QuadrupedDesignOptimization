@@ -6,9 +6,9 @@
 % This will be used to represent the spine of a quadruped in later work.
 
 % Set up the workspace
-clear all;
-close all;
-clc;
+%clear all;
+%close all;
+%clc;
 % The total length of the curve:
 L = 0.25;
 %L = 0.6;
@@ -63,9 +63,9 @@ tic;
 for i=1:num_points
     % Calculate T for this point
     % FOR THE ORIGINAL COORDINATE SYSTEM
-    %T = T_constK( [K; phi; s_range(i)]);
+    T = T_constK( [K; phi; s_range(i)]);
     % FOR THE ROTATED COORDINATE SYSTEM
-    T = T_constK_rotated( [K; phi; s_range(i)]);
+    %T = T_constK_rotated( [K; phi; s_range(i)]);
     % Store T appropriately
     T_i(:,:,i) = T;
     % Calculate the location of the centerline
@@ -76,9 +76,9 @@ for i=1:num_points
     for j=1:num_circle_points
         % the resulting point for the j-th point along the circle will be
         % FOR THE ORIGINAL COORDINATE SYSTEM
-        %circle_point_temp = T * [circle(1,j); circle(2,j); 0; 1];
+        circle_point_temp = T * [circle(1,j); circle(2,j); 0; 1];
         % FOR THE ROTATED COORDINATE SYSTEM
-        circle_point_temp = T * [circle(1,j); 0; circle(2,j); 1];
+        %circle_point_temp = T * [circle(1,j); 0; circle(2,j); 1];
         % store this point
         circle_results(:,j,i) = circle_point_temp(1:3);
     end
@@ -90,6 +90,7 @@ end
 toc;
 
 % Plot the centerline in 3D:
+figure;
 plot3( manip_points(1,:), manip_points(2,:), manip_points(3,:), 'r');
 grid on;
 axis equal;
