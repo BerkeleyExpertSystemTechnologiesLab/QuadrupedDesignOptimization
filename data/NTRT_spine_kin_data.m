@@ -22,9 +22,11 @@ logfile_base = '~/NTRTsim_logs/AppSpineKinematicsTest_';
 % First run with bending and a fixed :
 %logfile_timestamp = '01112017_141027';
 % With a much slower sampling rate, and the controller turning on at 3 sec:
-logfile_timestamp = '01122017_172522_edited';
+logfile_timestamp = '01122017_172522_edited_ordered';
 % A flag to control making plots or not
 make_plots = 1;
 
 % Call the parser function
 s = parseNTRTCompoundRigidData(logfile_base, logfile_timestamp, make_plots);
+
+% Add a constant-radius curvature line to the 
