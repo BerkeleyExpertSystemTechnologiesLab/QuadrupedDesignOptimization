@@ -6,9 +6,9 @@ function [ a2, b2, c2, d2 ] = qpedspine3SMove(t, g, p, plot_on, front_only, l, w
 %   the four feet are the bottom four nodes of the box, and the spine
 %   joint is in the middle of the top surface of the box.
 %   Inputs:
-%       t, theta, rotation in the x-direction (saggital bending)
-%       g, gamma, rotation in the y-direction (axial rotaion)
-%       p, phi, rotation in the z-direction (coronal bending)
+%       t, theta, rotation in the x-direction (saggital bending), radians
+%       g, gamma, rotation in the y-direction (axial rotaion), radians
+%       p, phi, rotation in the z-direction (coronal bending), radians
 %       plot_on, flag to turn on plotting the spine location in a new figure window
 %       front_only, a flag that controls if the front feet alone are rotated, or 
 %           if the back feet are rotated in the same way as the front feet. 

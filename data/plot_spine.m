@@ -1,5 +1,8 @@
 function plot_spine( d )
 %plot_spine Plots a straight-line approx of a spine on the current figure
+%   Andrew P. Sabelhaus
+%   Berkeley Emergent Space Tensegrities Lab
+%   Jan-Feb 2017
 %   Inputs: 
 %       d is a 2D array of X,Y,Z positions at one instant in time for each vertebrae in a spine.
 %           Has 3 rows, X,Y,Z, and n columns, for n vertebrae.
